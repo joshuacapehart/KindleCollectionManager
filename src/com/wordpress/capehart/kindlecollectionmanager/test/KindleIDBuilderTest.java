@@ -13,7 +13,7 @@ public class KindleIDBuilderTest {
 	@Test
 	public void testBuildKindleID() {
 		assertEquals("*c18726cfd23ecf53c911600405befb4bba25659d", 
-				KindleIDBuilder.buildKindleID(Paths.get("./test"), "test.pdf"));
+				KindleIDBuilder.buildKindleID(Paths.get("./test/test.pdf")));
 	}
 
 }

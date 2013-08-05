@@ -17,9 +17,9 @@ public class Book {
 	private String path;
 	private HashSet<KindleCollection> collections;
 	
-	public Book(String title) {
+	public Book(String title, String kindleID) {
 		this.title = title;
-		kindleID = "";
+		this.kindleID = kindleID;
 		path = "";
 		collections = new HashSet<KindleCollection>();
 	}
@@ -30,10 +30,6 @@ public class Book {
 
 	public String getKindleID() {
 		return kindleID;
-	}
-
-	public void setKindleID(String kindleID) {
-		this.kindleID = kindleID;
 	}
 
 	public String getPath() {

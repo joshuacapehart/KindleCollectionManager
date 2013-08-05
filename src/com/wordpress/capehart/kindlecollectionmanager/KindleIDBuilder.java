@@ -8,13 +8,19 @@ import java.security.NoSuchAlgorithmException;
 public class KindleIDBuilder {
 	private static final String HEXES = "0123456789abcdef";
 	
-	public static String buildKindleID(Path path, String filename) {
-		String extension = filename.substring(filename.lastIndexOf('.'));
-		String kindleID = "";
-		switch(extension) {
-		case ".pdf":
-			kindleID = buildHash(filename);
-			break;
+	public static String buildKindleID(Path path) {
+		String kindleID = null;
+		String filename = path.getFileName().toString();
+		int dotIndex = filename.lastIndexOf('.');
+		// If the file has no extension, we have no idea what to do with it.
+		// Maybe later we can figure out how to identify it.
+		if(dotIndex > -1) {
+			String extension = filename.substring(dotIndex);
+			switch(extension) {
+			case ".pdf":
+				kindleID = buildHash(filename);
+				break;
+			}
 		}
 		return kindleID;
 	}

@@ -12,7 +12,7 @@ public class BookTest {
 	@Test
 	public void testAddToCollection() {
 		KindleCollection collection = new KindleCollection("foo");
-		Book book = new Book("To kill a mockingbird");
+		Book book = new Book("To kill a mockingbird", "foo");
 		
 		book.addToCollection(collection);
 		assertTrue("Book did not add collection.", book.isInCollection(collection));
