@@ -15,7 +15,7 @@ public class Book {
 	private String title;
 	private String kindleID;
 	private String path;
-	private HashSet<KindleCollection> collections;
+	private Set<KindleCollection> collections;
 	
 	public Book(String title, String kindleID) {
 		this.title = title;

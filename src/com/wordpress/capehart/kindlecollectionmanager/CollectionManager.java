@@ -9,8 +9,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Controller for managing the collections on an Amazon kindle.
@@ -24,13 +29,14 @@ public class CollectionManager {
 	// The root directory of the Kindle.
 	private Path kindleRoot;
 	// Hash from kindleID to book.
-	private HashMap<String, Book> idToBook;
+	private Map<String, Book> idToBook;
 	// Hash from book filename to book.
-	private HashMap<String, Book> filenameToBook;
+	private Map<String, Book> filenameToBook;
 	// Hash from collection name to collection.
-	private HashMap<String, KindleCollection> collections;
+	private Map<String, KindleCollection> collections;
 	
-	private static final Path documentsPath = Paths.get("documents");
+	private static final Path DOCUMENTS_PATH = Paths.get("documents");
+	private static final Path COLLECTIONS_PATH = Paths.get("system/collections.json");
 	
 	public CollectionManager(String kindleRoot) {
 		this.kindleRoot = Paths.get(kindleRoot);
@@ -38,7 +44,7 @@ public class CollectionManager {
 		filenameToBook = new HashMap<String, Book>();
 		collections = new HashMap<String, KindleCollection>();
 		
-		buildBookList();
+		buildCollections();
 	}
 	
 	/**
@@ -59,7 +65,7 @@ public class CollectionManager {
 	
 	// Builds the books list from the Kindle directories.
 	private void buildBookList() {
-		try(DirectoryStream<Path> dir = Files.newDirectoryStream(kindleRoot.resolve(documentsPath))) {
+		try(DirectoryStream<Path> dir = Files.newDirectoryStream(kindleRoot.resolve(DOCUMENTS_PATH))) {
 			for(Path file : dir) {
 				String id = KindleIDBuilder.buildKindleID(file);
 				if(id != null) {
@@ -77,6 +83,54 @@ public class CollectionManager {
 	
 	// Builds the collections from the Kindle collections file.
 	private void buildCollections() {
+		buildBookList();
 		
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			// This is going to be fairly type unsafe, but we don't really have a choice.
+			// Because the json collections file contains arbitrary names for the key-value pairs,
+			// we can't use a json to Java Object mapping, and all Java json libraries are
+			// type unsafe when dealing with things this way. Checking the type of collection
+			// prevents a mismatch there at least.
+			
+			Map<String, Object> json = mapper.readValue(kindleRoot.resolve(COLLECTIONS_PATH).toFile(), Map.class);
+			
+			for(Map.Entry<String, Object> entry : json.entrySet()) {
+				KindleCollection collection = new KindleCollection(entry.getKey());
+				
+				Map<String, Object> collections = null;
+				if(entry.getValue() instanceof Map<?, ?>) {
+					collections = ((Map<String, Object>) entry.getValue());
+				}
+				
+				ArrayList<String> ids = null;
+				if(collections != null) { 
+					ids = (ArrayList<String>) collections.get("items");
+				}
+				
+				if(ids != null) {
+					for(String id : ids) {
+						Book book = idToBook.get(id);
+						// If we can't find the book, it may be that the Kindle
+						// still have the entry in the collections file, as well
+						// as the .pdr file, but not the book file itself.
+						// For this reason, we'll just ignore missing the book 
+						// for now.
+						if(book != null) {
+							collection.addBook(book);
+						}
+					}
+				}
+			}
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

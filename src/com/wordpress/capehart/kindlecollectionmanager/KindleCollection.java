@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class KindleCollection {
 	private String title;
-	private HashSet<Book> books;
+	private Set<Book> books;
 	
 	public KindleCollection(String title) {
 		this.title = title;
