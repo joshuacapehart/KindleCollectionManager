@@ -12,6 +12,7 @@ Alternatives do exist, but all have distinct limitations:
     - Not a very intuitive UI.
   - Amazon Kindle app
     - No Linux version, not cross-platform
+    - Does not work with books not downloaded from Amazon
   - Python script located at http://kcollect.googlecode.com/svn/trunk/kcollect
     - Very unintuitive, practically worthless for non-programmers
     - No simple way to use without additional scripts or lots of tedious typing
@@ -21,7 +22,9 @@ Goals
 This Kindle collection manager should:
   - Be cross-platform (Windows/Linux/Mac at least)
   - Have a reasonably intuitive GUI
+  - Work with all Kindle supported file formats
   - Be lightweight
+
 Optional goals are:
   - Scriptable
 

@@ -28,6 +28,10 @@ public class CollectionManager {
 		collections = new HashMap<String, KindleCollection>();
 	}
 	
+	public String getBookID(String filename) {
+		
+	}
+	
 	// Builds the books list from the Kindle directories.
 	private void buildBookList() {
 		
