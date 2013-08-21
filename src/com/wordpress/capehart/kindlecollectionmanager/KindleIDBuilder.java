@@ -18,6 +18,7 @@ public class KindleIDBuilder {
 			String extension = filename.substring(dotIndex);
 			switch(extension) {
 			case ".pdf":
+			case ".txt":
 				kindleID = buildHash(filename);
 				break;
 			}

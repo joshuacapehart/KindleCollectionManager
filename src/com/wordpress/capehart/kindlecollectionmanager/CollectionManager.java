@@ -76,8 +76,7 @@ public class CollectionManager {
 				}
 			}
 		} catch(IOException | DirectoryIteratorException e) {
-			System.out.println(e);
-			e.printStackTrace();
+			Logger.getInstance().log(LogLevel.FATAL_ERROR, e.toString());
 		}
 	}
 	
@@ -93,10 +92,12 @@ public class CollectionManager {
 			// type unsafe when dealing with things this way. Checking the type of collection
 			// prevents a mismatch there at least.
 			
+			@SuppressWarnings("unchecked")
 			Map<String, Object> json = mapper.readValue(kindleRoot.resolve(COLLECTIONS_PATH).toFile(), Map.class);
 			
 			for(Map.Entry<String, Object> entry : json.entrySet()) {
-				KindleCollection collection = new KindleCollection(entry.getKey());
+				String collectionName = entry.getKey().substring(0, entry.getKey().lastIndexOf("@"));
+				KindleCollection collection = new KindleCollection(collectionName);
 				
 				Map<String, Object> collections = null;
 				if(entry.getValue() instanceof Map<?, ?>) {
@@ -104,7 +105,7 @@ public class CollectionManager {
 				}
 				
 				ArrayList<String> ids = null;
-				if(collections != null) { 
+				if(collections != null) {
 					ids = (ArrayList<String>) collections.get("items");
 				}
 				
@@ -118,19 +119,20 @@ public class CollectionManager {
 						// for now.
 						if(book != null) {
 							collection.addBook(book);
+						} else {
+							Logger.getInstance().log(LogLevel.ERROR, 
+									"Book specified in collection not in directory with ID:",
+									id);
 						}
 					}
 				}
 			}
 		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.getInstance().log(LogLevel.FATAL_ERROR, e.toString());
+		} catch (JsonMappingException e) {	
+			Logger.getInstance().log(LogLevel.FATAL_ERROR, "Could not parse collection file.", e.toString());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.getInstance().log(LogLevel.FATAL_ERROR, "Could not open collection file.", e.toString());
 		}
 	}
 }
