@@ -1,0 +1,8 @@
+FATAL_ERROR:
+	java.nio.file.NoSuchFileException: D:\documents
+
+FATAL_ERROR:
+	Could not open collection file.
+
+	java.io.FileNotFoundException: D:\system\collections.json (The system cannot find the path specified)
+
