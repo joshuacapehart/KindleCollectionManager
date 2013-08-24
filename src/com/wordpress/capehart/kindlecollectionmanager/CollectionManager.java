@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -63,6 +64,26 @@ public class CollectionManager {
 		return id;
 	}
 	
+	public Set<String> getCollections() {
+		return collections.keySet();
+	}
+	public Set<String> getBooks() {
+		return filenameToBook.keySet();
+	}
+	
+	public ArrayList<String> getBooksInCollection(String collectionName) {
+		ArrayList<String> books = null;
+		KindleCollection collection = collections.get(collectionName);
+		if(collection != null) {
+			books = new ArrayList<String>(collection.getBooks().size());
+			for(Book book : collection.getBooks()) {
+				books.add(book.getTitle());
+			}
+		}
+		
+		return books;
+	}
+	
 	// Builds the books list from the Kindle directories.
 	private void buildBookList() {
 		try(DirectoryStream<Path> dir = Files.newDirectoryStream(kindleRoot.resolve(DOCUMENTS_PATH))) {
@@ -98,6 +119,7 @@ public class CollectionManager {
 			for(Map.Entry<String, Object> entry : json.entrySet()) {
 				String collectionName = entry.getKey().substring(0, entry.getKey().lastIndexOf("@"));
 				KindleCollection collection = new KindleCollection(collectionName);
+				collections.put(collectionName, collection);
 				
 				Map<String, Object> collections = null;
 				if(entry.getValue() instanceof Map<?, ?>) {
